@@ -211,3 +211,6 @@
 #define NORMAL_RAND 1
 #define LINEAR_RAND 2
 #define SQUARE_RAND 3
+
+//json_encode() flags
+#define JSON_PRETTY_PRINT 1
