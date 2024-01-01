@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DMCompiler.Compiler.DMPreprocessor;
 using OpenDreamShared.Compiler;
 using OpenDreamShared.Dream;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using String = System.String;
 
 namespace DMCompiler.Compiler.DM {
@@ -365,7 +365,7 @@ namespace DMCompiler.Compiler.DM {
                     if (pathElement != null) {
                         if(pathElement == "operator") {
                             Token operatorToken = Current();
-                            if(Current().Type == TokenType.DM_Slash) {
+                            if(operatorToken.Type == TokenType.DM_Slash) {
                                 //Up to this point, it's ambiguous whether it's a slash to mean operator/(), like the division operator overload
                                 //or "operator" just being used as a normal type name, as in a/operator/b/c/d
                                 Token peekToken = Advance();
@@ -376,9 +376,16 @@ namespace DMCompiler.Compiler.DM {
                                     ReuseToken(operatorToken);
                                     Error(WarningCode.SoftReservedKeyword, "Using \"operator\" as a path element is ambiguous");
                                 }
-                            } else if(Check(OperatorOverloadTypes)) {
+                            }
+
+                            var toStringOperator = false;
+                            if (operatorToken is { Type: TokenType.DM_ConstantString, Text: "\"\"" }) {
+                                Advance();
+                                toStringOperator = true;
+                            }
+                            if (toStringOperator || Check(OperatorOverloadTypes)) {
                                 operatorFlag = true;
-                                pathElement+=operatorToken.PrintableText;
+                                pathElement += operatorToken.PrintableText;
                             }
                         }
                         pathElements.Add(pathElement);
